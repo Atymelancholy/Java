@@ -1,6 +1,8 @@
 # Книжный форум
 Предназначен для обсуждения книг
 
+# Главная страница
+
 ![image](https://github.com/user-attachments/assets/a4db22a2-b7c5-4c32-8c19-ee83665fabcd)
 
 # Основные функции:
