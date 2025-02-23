@@ -2,7 +2,6 @@ package com.example.bookblog.repositories;
 
 import com.example.bookblog.models.Book;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -22,7 +21,7 @@ public class BookRepository {
         return BOOKS.stream()
                 .filter(book -> (book.title().equalsIgnoreCase(title))
                         || (book.author().equalsIgnoreCase(author)))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public Book findBookById(int id) {
