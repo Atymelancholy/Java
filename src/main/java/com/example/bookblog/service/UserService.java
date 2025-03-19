@@ -10,6 +10,7 @@ import com.example.bookblog.repository.CategoryRepository;
 import com.example.bookblog.repository.UserRepository;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
     private final CategoryRepository groupRepository;
+    private final ConcurrentHashMap<Long, UserWithResponsesAndCategoryDto> userCache
+            = new ConcurrentHashMap<>();
 
     @Autowired
     public UserService(UserRepository userRepository, CategoryRepository groupRepository) {
@@ -34,15 +37,11 @@ public class UserService {
     public UserWithResponsesAndCategoryDto getOne(Long id) throws UserNotFoundException {
         User user = userRepository.findWithPostsAndGroupsById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with this id not exist!!!"));
-        return UserWithResponsesAndCategoryDto.toModel(user);
-    }
 
-    public Long delete(Long id) throws UserNotFoundException {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException("User with this id does not exist!!!");
-        }
-        userRepository.deleteById(id);
-        return id;
+        UserWithResponsesAndCategoryDto dto = UserWithResponsesAndCategoryDto.toModel(user);
+        userCache.put(id, dto);
+
+        return dto;
     }
 
     public User getUserById(Long id) throws UserNotFoundException {
@@ -54,15 +53,38 @@ public class UserService {
         }
     }
 
-    public void addUserToGroup(Long userId, Long groupId) throws UserNotFoundException,
-            CategoryNotFoundException {
+    public void addUserToGroup(Long userId, Long groupId)
+            throws UserNotFoundException, CategoryNotFoundException {
         User user = getUserById(userId);
         Category group = groupRepository.findById(groupId)
-                .orElseThrow(() ->
-                        new CategoryNotFoundException("Group with this id not exist!!!"));
+                .orElseThrow(()
+                        -> new CategoryNotFoundException("Group with this id not exist!!!"));
 
         user.addGroup(group);
         userRepository.save(user);
+
+        userCache.remove(userId);
+        getOne(userId);
+    }
+
+    public void updateUser(Long id, User updatedUser) throws UserNotFoundException {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User with this ID not exist!!!"));
+
+        existingUser.setUsername(updatedUser.getUsername());
+        existingUser.setPassword(updatedUser.getPassword());
+        userRepository.save(existingUser);
+
+        userCache.remove(id);
+        getOne(id);
+    }
+
+    public void delete(Long id) throws UserNotFoundException {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException("User with this id does not exist!!!");
+        }
+        userRepository.deleteById(id);
+        userCache.remove(id);
     }
 
     public void removeUserFromGroup(Long userId, Long groupId) throws UserNotFoundException,
@@ -78,15 +100,4 @@ public class UserService {
     public Set<Category> getUserGroups(Long userId) throws UserNotFoundException {
         return getUserById(userId).getCategories();
     }
-
-    public void updateUser(Long id, User updatedUser) throws UserNotFoundException {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User with this ID not exist!!!"));
-
-        existingUser.setUsername(updatedUser.getUsername());
-        existingUser.setPassword(updatedUser.getPassword());
-
-        userRepository.save(existingUser);
-    }
 }
-

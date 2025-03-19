@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ResponseRepository extends JpaRepository<Response, Long> {
     List<Response> findByUserId(Long userId);
+
+    List<Response> findByBookId(Long bookId);
 }

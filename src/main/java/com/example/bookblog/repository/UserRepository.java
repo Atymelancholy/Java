@@ -12,4 +12,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @EntityGraph(attributePaths = {"responses", "categories"})
     Optional<User> findWithPostsAndGroupsById(Long id);
+
 }

@@ -25,8 +25,21 @@ public class Category {
     @JsonIgnore
     private Set<User> users = new HashSet<>();
 
-    public Category() {
-        // constructor
+    @ManyToMany(mappedBy = "categories",
+            cascade = { CascadeType.PERSIST, CascadeType.MERGE },
+            fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<Book> books = new HashSet<>();
+
+    public Category() {}
+
+
+    public Set<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(Set<Book> books) {
+        this.books = books;
     }
 
     public Long getId() {

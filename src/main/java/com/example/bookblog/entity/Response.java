@@ -24,15 +24,26 @@ public class Response {
     @JsonIgnore
     private User user;
 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id")
+    @JsonIgnore
+    private Book book;
+
     public Response() {}
 
-    public Response(String content, User user) {
+    public Response(String content, User user, Book book) {
         this.content = content;
         this.user = user;
+        this.book = book;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getContent() {
@@ -49,5 +60,13 @@ public class Response {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Book getBook() {
+        return book;
+    }
+
+    public void setBook(Book book) {
+        this.book = book;
     }
 }
