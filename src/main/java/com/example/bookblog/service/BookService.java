@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class BookService {
 
     private final BookRepository bookRepository;
-    private final InMemoryCache<Long, Book> bookCache;
+    private final InMemoryCache<Long, Book> book;
 
     // Renamed the constructor parameter to 'cache' to avoid conflict
     public BookService(BookRepository bookRepository, InMemoryCache<Long, Book> cache) {
