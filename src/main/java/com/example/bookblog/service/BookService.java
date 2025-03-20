@@ -10,8 +10,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class BookService {
-    @Autowired
-    private BookRepository bookRepository;
+
+    private final BookRepository bookRepository;
+    private final InMemoryCache<Long, Book> bookCache;
+
+    public BookService(BookRepository bookRepository, InMemoryCache<Long, Book> bookCache) {
+        this.bookRepository = bookRepository;
+        this.bookCache = bookCache;
+    }
 
     @Autowired
     private InMemoryCache<Long, Book> bookCache;
