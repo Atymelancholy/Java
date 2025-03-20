@@ -74,7 +74,7 @@ public class CategoryService {
                                 -> new CategoryNotFoundException("Category "
                                 + "with this id does not exist!"));
             } catch (CategoryNotFoundException e) {
-                throw new RuntimeException(e);
+                throw new CacheMissException("Cache miss occurred while fetching the category", e);
             }
         });
     }
