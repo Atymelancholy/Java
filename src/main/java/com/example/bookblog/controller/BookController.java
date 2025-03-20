@@ -13,9 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/books")
 public class BookController {
     
-    @Autowired
-    private BookService bookService;
-
     @GetMapping
     public List<Book> getAllBooks() {
         return bookService.getAllBooks();
