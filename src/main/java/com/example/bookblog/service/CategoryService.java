@@ -20,6 +20,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class CategoryService {
     private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
+    
+    private static final String CACHE_MISS_MESSAGE = "Cache miss: fetching categories from database";
+    
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final InMemoryCache<Long, CategoryWithUsersDto> categoryCache;
@@ -28,9 +31,8 @@ public class CategoryService {
     @Autowired
     public CategoryService(CategoryRepository categoryRepository,
                            UserRepository userRepository,
-                           InMemoryCache<Long, CategoryWithUsersDto>
-                                       categoryCache, InMemoryCache<String,
-            List<CategoryWithUsersDto>> searchCache) {
+                           InMemoryCache<Long, CategoryWithUsersDto> categoryCache, 
+                           InMemoryCache<String, List<CategoryWithUsersDto>> searchCache) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.categoryCache = categoryCache;
@@ -42,7 +44,7 @@ public class CategoryService {
                 + (name != null ? name : "all") + "_" + (username != null ? username : "all");
         logger.info("Searching categories with key: {}", cacheKey);
         return searchCache.getOrCompute(cacheKey, () -> {
-            logger.info("Cache miss: fetching categories from database");
+            logger.info(CACHE_MISS_MESSAGE);
             return categoryRepository.searchCategories(name, username)
                     .stream()
                     .map(CategoryWithUsersDto::toModel)
@@ -64,7 +66,7 @@ public class CategoryService {
     public CategoryWithUsersDto getOne(Long id) throws CategoryNotFoundException {
         logger.info("Fetching category with ID: {}", id);
         return categoryCache.getOrCompute(id, () -> {
-            logger.info("Cache miss: fetching category from database");
+            logger.info(CACHE_MISS_MESSAGE);
             try {
                 return categoryRepository.findWithUsersById(id)
                         .map(CategoryWithUsersDto::toModel)
@@ -83,7 +85,7 @@ public class CategoryService {
                 + "cache key: {}", minUsers, cacheKey);
 
         return searchCache.getOrCompute(cacheKey, () -> {
-            logger.info("Cache miss: fetching categories from database");
+            logger.info(CACHE_MISS_MESSAGE);
             return categoryRepository.findCategoriesByMinUsers(minUsers)
                     .stream()
                     .map(CategoryWithUsersDto::toModel)
@@ -97,7 +99,7 @@ public class CategoryService {
                 + "users, cache key: {}", minUsers, cacheKey);
 
         return searchCache.getOrCompute(cacheKey, () -> {
-            logger.info("Cache miss: fetching categories from database");
+            logger.info(CACHE_MISS_MESSAGE);
             return categoryRepository.findCategoriesByMinUsersNative(minUsers)
                     .stream()
                     .map(CategoryWithUsersDto::toModel)
