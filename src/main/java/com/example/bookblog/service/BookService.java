@@ -14,9 +14,10 @@ public class BookService {
     private final BookRepository bookRepository;
     private final InMemoryCache<Long, Book> bookCache;
 
-    public BookService(BookRepository bookRepository, InMemoryCache<Long, Book> bookCache) {
+    // Renamed the constructor parameter to 'cache' to avoid conflict
+    public BookService(BookRepository bookRepository, InMemoryCache<Long, Book> cache) {
         this.bookRepository = bookRepository;
-        this.bookCache = bookCache;
+        this.bookCache = cache;
     }
 
     @Autowired
@@ -31,14 +32,13 @@ public class BookService {
     }
 
     public void createBook(Book book) {
-        // Убедитесь, что id не задан для нового объекта
+        // Ensure that id is not set for a new object
         if (book.getId() != null) {
             throw new IllegalArgumentException("The id should be null for new books");
         }
 
-        bookRepository.save(book);  // id будет сгенерировано автоматически
+        bookRepository.save(book);  // id will be automatically generated
     }
-
 
     public void updateBook(Long id, Book updatedBook) throws Exception {
         Book existingBook = bookRepository.findById(id).orElseThrow(()
