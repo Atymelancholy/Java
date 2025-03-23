@@ -31,9 +31,6 @@ public class Category {
     @JsonIgnore
     private Set<Book> books = new HashSet<>();
 
-    public Category() {}
-
-
     public Set<Book> getBooks() {
         return books;
     }
