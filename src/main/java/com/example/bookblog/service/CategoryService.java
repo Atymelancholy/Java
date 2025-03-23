@@ -40,8 +40,7 @@ public class CategoryService {
     }
 
     public Category registration(Category category) throws CategoryAlreadyExistException {
-        logger.info("Registering new category: {}", category.getName());
-
+      
         if (category.getName() == null || category.getName().trim().isEmpty()) {
             throw new ValidationException("Category name must not be empty");
         }
