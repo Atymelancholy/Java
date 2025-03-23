@@ -6,19 +6,20 @@ import com.example.bookblog.exception.BookAlreadyExistException;
 import com.example.bookblog.exception.BookNotFoundException;
 import com.example.bookblog.exception.ValidationException;
 import com.example.bookblog.repository.BookRepository;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class BookService {
+    private final BookRepository bookRepository;
+    private final InMemoryCache<Long, Book> bookCache;
 
-    @Autowired
-    private BookRepository bookRepository;
-
-    @Autowired
-    private InMemoryCache<Long, Book> bookCache;
+    public BookService(BookRepository bookRepository, InMemoryCache<Long, Book> bookCache) {
+        this.bookRepository = bookRepository;
+        this.bookCache = bookCache;
+    }
 
     public List<Book> getAllBooks() {
         return bookRepository.findAll();
@@ -34,29 +35,23 @@ public class BookService {
 
     public void createBook(Book book) throws BookAlreadyExistException {
         if (bookRepository.existsByTitleAndAuthor(book.getTitle(), book.getAuthor())) {
-            throw new BookAlreadyExistException("A book with "
-                    + "this title and author already exists!");
+            throw new BookAlreadyExistException("A book with this title and author already exists!");
         }
-
         if (book.getId() != null) {
             throw new IllegalArgumentException("The id should be null for new books");
         }
-
         if (book.getTitle() == null || book.getTitle().trim().isEmpty()) {
             throw new ValidationException("Title must not be empty");
         }
-
         if (book.getAuthor() == null || book.getAuthor().trim().isEmpty()) {
             throw new ValidationException("Author must not be empty");
         }
-
-
         bookRepository.save(book);
     }
 
     public void updateBook(Long id, Book updatedBook) throws BookNotFoundException {
-        Book existingBook = bookRepository.findById(id).orElseThrow(() ->
-                new BookNotFoundException("Book with this ID not found"));
+        Book existingBook = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException("Book with this ID not found"));
 
         if (updatedBook.getTitle().isBlank() || updatedBook.getAuthor().isBlank()) {
             throw new ValidationException("Title and Author must not be empty");
@@ -69,8 +64,9 @@ public class BookService {
     }
 
     public void deleteBook(Long id) throws BookNotFoundException {
-        Book book = bookRepository.findById(id).orElseThrow(()
-                -> new BookNotFoundException("Book with this ID not found"));
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException("Book with this ID not found"));
+
         bookRepository.delete(book);
         bookCache.remove(id);
     }
