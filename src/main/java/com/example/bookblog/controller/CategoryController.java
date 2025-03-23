@@ -67,7 +67,7 @@ public class CategoryController {
         @ApiResponse(responseCode = "500", description = "Ошибка сервера")
     })
     @PostMapping
-    public ResponseEntity<?> registrationGroup(@Valid @RequestBody Category group,
+    public ResponseEntity<String> registrationGroup(@Valid @RequestBody Category group,
                                                BindingResult result) {
         if (result.hasErrors()) {
             String errorMessages = result.getAllErrors()
