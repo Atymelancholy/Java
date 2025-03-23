@@ -97,7 +97,7 @@ public class LogController {
         try {
             Files.setPosixFilePermissions(tempFile, PosixFilePermissions.fromString("rw-------"));
         } catch (UnsupportedOperationException e) {
-            throw new RuntimeException("Failed to set POSIX file permissions", e);
+            throw new FilePermissionException("Failed to set POSIX file permissions", e);
         }
 
         try (BufferedWriter writer = Files.newBufferedWriter(tempFile, StandardCharsets.UTF_8,
