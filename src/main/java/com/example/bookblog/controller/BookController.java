@@ -27,8 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
         "API для управления книгами")
 public class BookController {
 
+    private final BookService bookService;
+
     @Autowired
-    private BookService bookService;
+    public BookController(BookService bookService) {
+        this.bookService = bookService;
+    }
 
     @Operation(summary = "Получение всех книг", description = "Возвращает список всех книг")
     @GetMapping
@@ -43,13 +47,14 @@ public class BookController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<Book> getBookById(@PathVariable Long id) {
-        Optional<Book> book = bookService.getBookById(id);
-        return book.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return bookService.getBookById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Operation(summary = "Добавление новой книги", description = "Создает новую книгу")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Книга успешно добавлена"),
+        @ApiResponse(responseCode = "201", description = "Книга успешно добавлена"),
         @ApiResponse(responseCode = "400", description = "Ошибка при добавлении книги")
     })
     @PostMapping
@@ -96,3 +101,4 @@ public class BookController {
         }
     }
 }
+
