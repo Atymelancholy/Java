@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
     Optional<Book> findById(Long id);
+
+    boolean existsByTitleAndAuthor(String title, String author);
 }

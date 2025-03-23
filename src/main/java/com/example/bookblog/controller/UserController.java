@@ -7,6 +7,10 @@ import com.example.bookblog.exception.CategoryNotFoundException;
 import com.example.bookblog.exception.UserAlreadyExistException;
 import com.example.bookblog.exception.UserNotFoundException;
 import com.example.bookblog.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/users")
+@Tag(name = "User Controller", description = "API для управления пользователями")
 public class UserController {
     private final UserService userService;
 
@@ -29,6 +34,12 @@ public class UserController {
         this.userService = userService;
     }
 
+    @Operation(summary = "Регистрация пользователя",
+            description = "Регистрирует нового пользователя")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Пользователь успешно добавлен"),
+        @ApiResponse(responseCode = "400", description = "Ошибка при добавлении пользователя")
+    })
     @PostMapping
     public ResponseEntity<String> registrationUser(@RequestBody User user) {
         try {
@@ -41,6 +52,12 @@ public class UserController {
         }
     }
 
+    @Operation(summary = "Получение информации о пользователе",
+            description = "Возвращает информацию о пользователе по его ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Пользователь найден"),
+        @ApiResponse(responseCode = "404", description = "Пользователь не найден")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<UserWithResponsesAndCategoryDto> getOneUserPath(@PathVariable Long id) {
         try {
@@ -51,6 +68,11 @@ public class UserController {
         }
     }
 
+    @Operation(summary = "Удаление пользователя", description = "Удаляет пользователя по его ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Пользователь успешно удален"),
+        @ApiResponse(responseCode = "404", description = "Пользователь не найден")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         try {
@@ -63,6 +85,13 @@ public class UserController {
         }
     }
 
+    @Operation(summary = "Добавление пользователя в категорию",
+            description = "Добавляет пользователя в категорию")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Пользователь добавлен в категорию"),
+        @ApiResponse(responseCode = "404",
+                description = "Пользователь или категория не найдены")
+    })
     @PostMapping("/{userId}/categories/{groupId}")
     public ResponseEntity<String> addUserToGroup(@PathVariable Long userId,
                                                  @PathVariable Long groupId) {
@@ -74,6 +103,13 @@ public class UserController {
         }
     }
 
+    @Operation(summary = "Удаление пользователя из категории",
+            description = "Удаляет пользователя из категории")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Пользователь удален из категории"),
+        @ApiResponse(responseCode = "404",
+                description = "Пользователь или категория не найдены")
+    })
     @DeleteMapping("/{userId}/categories/{groupId}")
     public ResponseEntity<String> removeUserFromGroup(@PathVariable Long userId,
                                                       @PathVariable Long groupId) {
@@ -85,6 +121,12 @@ public class UserController {
         }
     }
 
+    @Operation(summary = "Получение категорий пользователя",
+            description = "Возвращает все категории, в которых состоит пользователь")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Категории пользователя получены"),
+        @ApiResponse(responseCode = "404", description = "Пользователь не найден")
+    })
     @GetMapping("/{userId}/categories")
     public ResponseEntity<Set<Category>> getUserGroups(@PathVariable Long userId) {
         try {
@@ -94,6 +136,13 @@ public class UserController {
         }
     }
 
+    @Operation(summary = "Обновление информации о пользователе",
+            description = "Обновляет информацию о пользователе по ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Пользователь успешно обновлен"),
+        @ApiResponse(responseCode = "404", description = "Пользователь не найден"),
+        @ApiResponse(responseCode = "400", description = "Ошибка при обновлении пользователя")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<String> updateUser(@PathVariable Long id,
                                              @RequestBody User updatedUser) {

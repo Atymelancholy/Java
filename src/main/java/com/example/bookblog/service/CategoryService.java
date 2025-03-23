@@ -4,8 +4,10 @@ import com.example.bookblog.cache.InMemoryCache;
 import com.example.bookblog.dto.CategoryWithUsersDto;
 import com.example.bookblog.entity.Category;
 import com.example.bookblog.entity.User;
+import com.example.bookblog.exception.CacheMissException;
 import com.example.bookblog.exception.CategoryAlreadyExistException;
 import com.example.bookblog.exception.CategoryNotFoundException;
+import com.example.bookblog.exception.ValidationException;
 import com.example.bookblog.repository.CategoryRepository;
 import com.example.bookblog.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -37,21 +39,13 @@ public class CategoryService {
         this.searchCache = searchCache;
     }
 
-    public List<CategoryWithUsersDto> searchCategories(String name, String username) {
-        String cacheKey = "search_"
-                + (name != null ? name : "all") + "_" + (username != null ? username : "all");
-        logger.info("Searching categories with key: {}", cacheKey);
-        return searchCache.getOrCompute(cacheKey, () -> {
-            logger.info("Cache miss: fetching categories from database");
-            return categoryRepository.searchCategories(name, username)
-                    .stream()
-                    .map(CategoryWithUsersDto::toModel)
-                    .toList();
-        });
-    }
-
     public Category registration(Category category) throws CategoryAlreadyExistException {
         logger.info("Registering new category: {}", category.getName());
+
+        if (category.getName() == null || category.getName().trim().isEmpty()) {
+            throw new ValidationException("Category name must not be empty");
+        }
+
         if (categoryRepository.findByName(category.getName()) != null) {
             throw new CategoryAlreadyExistException("Category with this name already exists!");
         }
@@ -72,7 +66,7 @@ public class CategoryService {
                                 -> new CategoryNotFoundException("Category "
                                 + "with this id does not exist!"));
             } catch (CategoryNotFoundException e) {
-                throw new RuntimeException(e);
+                throw new CacheMissException("Cache miss occurred while fetching the category", e);
             }
         });
     }
@@ -117,6 +111,10 @@ public class CategoryService {
             userRepository.save(user);
         }
 
+        if (category.getBooks() != null) {
+            category.getBooks().forEach(book -> book.setCategories(null));
+        }
+
         categoryRepository.delete(category);
         categoryCache.remove(groupId);
         searchCache.clear();
@@ -125,6 +123,11 @@ public class CategoryService {
 
     public void updateGroup(Long id, Category updatedCategory) throws CategoryNotFoundException {
         logger.info("Updating category with ID: {}", id);
+
+        if (updatedCategory.getName() == null || updatedCategory.getName().trim().isEmpty()) {
+            throw new ValidationException("Category name must not be empty");
+        }
+
         Category existingCategory = categoryRepository.findById(id)
                 .orElseThrow(()
                         -> new CategoryNotFoundException("Category with this ID does not exist!"));

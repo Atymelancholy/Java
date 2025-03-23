@@ -6,6 +6,7 @@ import com.example.bookblog.entity.User;
 import com.example.bookblog.exception.CategoryNotFoundException;
 import com.example.bookblog.exception.UserAlreadyExistException;
 import com.example.bookblog.exception.UserNotFoundException;
+import com.example.bookblog.exception.ValidationException;
 import com.example.bookblog.repository.CategoryRepository;
 import com.example.bookblog.repository.UserRepository;
 import java.util.Optional;
@@ -28,6 +29,14 @@ public class UserService {
     }
 
     public User registration(User user) throws UserAlreadyExistException {
+        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+            throw new ValidationException("Username must not be empty");
+        }
+
+        if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+            throw new ValidationException("Password must not be empty");
+        }
+
         if (userRepository.findByUsername(user.getUsername()) != null) {
             throw new UserAlreadyExistException("User with this name already exists!!!");
         }
@@ -68,6 +77,14 @@ public class UserService {
     }
 
     public void updateUser(Long id, User updatedUser) throws UserNotFoundException {
+        if (updatedUser.getUsername() == null || updatedUser.getUsername().trim().isEmpty()) {
+            throw new ValidationException("Username must not be empty");
+        }
+
+        if (updatedUser.getPassword() == null || updatedUser.getPassword().trim().isEmpty()) {
+            throw new ValidationException("Password must not be empty");
+        }
+
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with this ID not exist!!!"));
 

@@ -6,6 +6,7 @@ import com.example.bookblog.entity.User;
 import com.example.bookblog.exception.BookNotFoundException;
 import com.example.bookblog.exception.PostNotFoundException;
 import com.example.bookblog.exception.UserNotFoundException;
+import com.example.bookblog.exception.ValidationException;
 import com.example.bookblog.repository.BookRepository;
 import com.example.bookblog.repository.ResponseRepository;
 import com.example.bookblog.repository.UserRepository;
@@ -30,6 +31,10 @@ public class ResponseService {
 
     public Response createResponse(Long userId, Long bookId, String content)
             throws UserNotFoundException, BookNotFoundException {
+        if (content == null || content.trim().isEmpty()) {
+            throw new ValidationException("Response content must not be empty");
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
@@ -72,6 +77,10 @@ public class ResponseService {
     }
 
     public void updateResponse(Long responseId, String content) throws PostNotFoundException {
+        if (content == null || content.trim().isEmpty()) {
+            throw new ValidationException("Response content must not be empty");
+        }
+
         Response response = responseRepository.findById(responseId)
                 .orElseThrow(()
                         -> new PostNotFoundException("Response with this id does not exist!!!"));
