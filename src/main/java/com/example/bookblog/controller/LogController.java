@@ -75,11 +75,11 @@ public class LogController {
     private List<String> filterLogsByDate(List<String> logs, String date) {
         List<String> filteredLogs = new ArrayList<>();
         for (String log : logs) {
-            if (log.matches("^" + date + ".*")
-                    && !log.contains("INFO - Вход в метод контроллера")) {
-                filteredLogs.add(log);
-            }
+        if (log.startsWith(date)  // Avoids regex construction
+                && !log.contains("INFO - Вход в метод контроллера")) {
+            filteredLogs.add(log);
         }
+    }
         return filteredLogs;
     }
 
