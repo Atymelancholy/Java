@@ -55,7 +55,7 @@ public class CategoryService {
         return savedCategory;
     }
 
-    public CategoryWithUsersDto getOne(Long id) throws CategoryNotFoundException {
+    public CategoryWithUsersDto getOne(Long id) {
         logger.info("Fetching category with ID: {}", id);
         return categoryCache.getOrCompute(id, () -> {
             logger.info("Cache miss: fetching category from database");
