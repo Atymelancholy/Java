@@ -94,12 +94,6 @@ public class LogController {
 
         Path tempFile = Files.createTempFile(tempDir, "logs-" + safeDate + "-", ".log");
 
-        try {
-            Files.setPosixFilePermissions(tempFile, PosixFilePermissions.fromString("rw-------"));
-        } catch (UnsupportedOperationException e) {
-            throw new FilePermissionException("Failed to set POSIX file permissions", e);
-        }
-
         try (BufferedWriter writer = Files.newBufferedWriter(tempFile, StandardCharsets.UTF_8,
                 StandardOpenOption.WRITE)) {
             for (String log : logs) {
