@@ -48,6 +48,14 @@ public class BookService {
         bookRepository.save(book);
     }
 
+    public boolean existsByTitleAndAuthor(String title, String author) {
+        return bookRepository.existsByTitleAndAuthor(title, author);
+    }
+
+    public List<Book> saveBooksBulk(List<Book> books) {
+        return bookRepository.saveAll(books);
+    }
+    
     public void updateBook(Long id, Book updatedBook) throws BookNotFoundException {
         Book existingBook = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException("Book with this ID not found"));
