@@ -8,6 +8,6 @@ class BookBlogApplicationTests {
 
 	@Test
 	void contextLoads() {
-	    // Этот тест проверяет, загружается ли контекст Spring Boot успешно.
+		// Этот тест проверяет, загружается ли контекст Spring Boot успешно.
 	}
 }
