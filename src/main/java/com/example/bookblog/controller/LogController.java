@@ -75,11 +75,11 @@ public class LogController {
     private List<String> filterLogsByDate(List<String> logs, String date) {
         List<String> filteredLogs = new ArrayList<>();
         for (String log : logs) {
-            if (log.matches("^" + date + ".*")
-                    && !log.contains("INFO - Вход в метод контроллера")) {
-                filteredLogs.add(log);
-            }
+        if (log.startsWith(date)  // Avoids regex construction
+                && !log.contains("INFO - Вход в метод контроллера")) {
+            filteredLogs.add(log);
         }
+    }
         return filteredLogs;
     }
 
@@ -93,12 +93,6 @@ public class LogController {
         }
 
         Path tempFile = Files.createTempFile(tempDir, "logs-" + safeDate + "-", ".log");
-
-        try {
-            Files.setPosixFilePermissions(tempFile, PosixFilePermissions.fromString("rw-------"));
-        } catch (UnsupportedOperationException e) {
-            throw new RuntimeException("Failed to set POSIX file permissions", e);
-        }
 
         try (BufferedWriter writer = Files.newBufferedWriter(tempFile, StandardCharsets.UTF_8,
                 StandardOpenOption.WRITE)) {

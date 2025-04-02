@@ -67,7 +67,7 @@ public class CategoryController {
         @ApiResponse(responseCode = "500", description = "Ошибка сервера")
     })
     @PostMapping
-    public ResponseEntity<?> registrationGroup(@Valid @RequestBody Category group,
+    public ResponseEntity<String> registrationGroup(@Valid @RequestBody Category category,
                                                BindingResult result) {
         if (result.hasErrors()) {
             String errorMessages = result.getAllErrors()
@@ -78,7 +78,7 @@ public class CategoryController {
         }
 
         try {
-            groupService.registration(group);
+            groupService.registration(category);
             return ResponseEntity.ok().body("Category added");
         } catch (CategoryAlreadyExistException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

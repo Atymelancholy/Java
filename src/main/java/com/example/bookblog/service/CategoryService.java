@@ -40,8 +40,7 @@ public class CategoryService {
     }
 
     public Category registration(Category category) throws CategoryAlreadyExistException {
-        logger.info("Registering new category: {}", category.getName());
-
+      
         if (category.getName() == null || category.getName().trim().isEmpty()) {
             throw new ValidationException("Category name must not be empty");
         }
@@ -55,7 +54,7 @@ public class CategoryService {
         return savedCategory;
     }
 
-    public CategoryWithUsersDto getOne(Long id) throws CategoryNotFoundException {
+    public CategoryWithUsersDto getOne(Long id) {
         logger.info("Fetching category with ID: {}", id);
         return categoryCache.getOrCompute(id, () -> {
             logger.info("Cache miss: fetching category from database");
