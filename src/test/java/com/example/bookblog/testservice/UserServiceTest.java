@@ -186,13 +186,15 @@ class UserServiceTest {
         verify(userRepository, never()).save(any());
     }
 
-    @Test
     void testUpdateUser_EmptyPassword() {
         User updatedUser = new User();
         updatedUser.setUsername("valid");
         updatedUser.setPassword("");
-
-        assertThrows(ValidationException.class, () -> userService.updateUser(user.getId(), updatedUser));
+        
+        assertThrows(ValidationException.class, () -> {
+            UUID userId = user.getId();
+            userService.updateUser(userId, updatedUser);
+        });
 
         verify(userRepository, never()).findById(any());
         verify(userRepository, never()).save(any());
