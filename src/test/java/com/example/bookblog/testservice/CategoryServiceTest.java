@@ -3,7 +3,6 @@ package com.example.bookblog.testservice;
 import com.example.bookblog.cache.InMemoryCache;
 import com.example.bookblog.dto.CategoryWithUsersDto;
 import com.example.bookblog.entity.Category;
-import com.example.bookblog.exception.CacheMissException;
 import com.example.bookblog.exception.CategoryAlreadyExistException;
 import com.example.bookblog.exception.CategoryNotFoundException;
 import com.example.bookblog.exception.ValidationException;
@@ -22,7 +21,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
