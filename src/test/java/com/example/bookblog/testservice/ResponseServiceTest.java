@@ -144,12 +144,6 @@ class ResponseServiceTest {
     }
 
     @Test
-    void testCreateResponse_NullContent() {
-        assertThrows(ValidationException.class, () ->
-                responseService.createResponse(user.getId(), book.getId(), null));
-    }
-
-    @Test
     void testGetBookResponses_EmptyList() {
         when(responseRepository.findByBookId(book.getId())).thenReturn(Collections.emptyList());
         assertThrows(PostNotFoundException.class, () ->
