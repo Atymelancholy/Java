@@ -111,26 +111,31 @@ public class BookController {
     })
     @PostMapping(value = "/bulk")
     public ResponseEntity<List<Book>> addBooksBulk(@RequestBody List<Book> books) {
-        List<Book> validBooks = books.stream()
-                .peek(book -> {
-                    if (book.getTitle() == null || book.getTitle().trim().isEmpty()) {
-                        throw new IllegalArgumentException("Title must not be empty");
-                    }
-                    if (book.getAuthor() == null || book.getAuthor().trim().isEmpty()) {
-                        throw new IllegalArgumentException("Author must not be empty");
-                    }
-                    book.setId(null);
-                })
-                .filter(book -> !bookService.existsByTitleAndAuthor(book.getTitle(),
-                        book.getAuthor()))
-                .collect(Collectors.toList());
+    if (books == null || books.isEmpty()) {
+        throw new IllegalArgumentException("Book list must not be empty");
+    }
 
-        if (validBooks.isEmpty()) {
-            throw  new IllegalArgumentException("Bad request");
+    List<Book> validBooks = new ArrayList<>();
+
+    for (Book book : books) {
+        if (book.getTitle() == null || book.getTitle().trim().isEmpty()) {
+            throw new IllegalArgumentException("Title must not be empty");
         }
+        if (book.getAuthor() == null || book.getAuthor().trim().isEmpty()) {
+            throw new IllegalArgumentException("Author must not be empty");
+        }
+        if (!bookService.existsByTitleAndAuthor(book.getTitle(), book.getAuthor())) {
+            book.setId(null); // Ensure ID is null for new insert
+            validBooks.add(book);
+        }
+    }
 
-        List<Book> savedBooks = bookService.saveBooksBulk(validBooks);
-        return new ResponseEntity<>(savedBooks, HttpStatus.CREATED);
-    }    
+    if (validBooks.isEmpty()) {
+        throw new IllegalArgumentException("No valid books to add");
+    }
+
+    List<Book> savedBooks = bookService.saveBooksBulk(validBooks);
+    return new ResponseEntity<>(savedBooks, HttpStatus.CREATED);
+    } 
 }
 
