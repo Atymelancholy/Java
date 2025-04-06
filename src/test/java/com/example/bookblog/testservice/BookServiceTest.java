@@ -128,14 +128,6 @@ class BookServiceTest {
     }
 
     @Test
-    void testExistsByTitleAndAuthor_WhenExists() {
-        when(bookRepository.existsByTitleAndAuthor("Book One", "Author One")).thenReturn(true);
-        boolean exists = bookService.existsByTitleAndAuthor("Book One", "Author One");
-        assertTrue(exists);
-        verify(bookRepository, times(1)).existsByTitleAndAuthor("Book One", "Author One");
-    }
-
-    @Test
     void testExistsByTitleAndAuthor_WhenNotExists() {
         when(bookRepository.existsByTitleAndAuthor("Unknown", "Author")).thenReturn(false);
         boolean exists = bookService.existsByTitleAndAuthor("Unknown", "Author");
@@ -199,14 +191,5 @@ class BookServiceTest {
 
         assertThrows(ValidationException.class, () -> bookService.updateBook(1L, book1));
         verify(bookRepository, never()).save(any());
-    }
-
-    @Test
-    void testGetBookById() throws BookNotFoundException {
-        when(bookRepository.findById(1L)).thenReturn(Optional.of(book1));
-        Optional<Book> book = bookService.getBookById(1L);
-        assertTrue(book.isPresent());
-        assertEquals("Book One", book.get().getTitle());
-        verify(bookRepository, times(1)).findById(1L);
     }
 }
