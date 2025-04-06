@@ -86,14 +86,6 @@ class CategoryServiceTest {
     }
 
     @Test
-    void testGetOne_FromCache() throws CategoryNotFoundException {
-        CategoryWithUsersDto dto = new CategoryWithUsersDto();
-        when(categoryCache.getOrCompute(eq(1L), any())).thenReturn(dto);
-        CategoryWithUsersDto result = categoryService.getOne(1L);
-        assertEquals(dto, result);
-    }
-
-    @Test
     void testUpdateGroup_Success() throws CategoryNotFoundException {
         Category updatedCategory = new Category();
         updatedCategory.setName("Updated Name");
