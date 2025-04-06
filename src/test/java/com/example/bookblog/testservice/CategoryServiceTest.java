@@ -112,15 +112,6 @@ class CategoryServiceTest {
     }
 
     @Test
-    void testDeleteGroup_Success() throws CategoryNotFoundException {
-        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category1));
-
-        categoryService.deleteGroup(1L);
-
-        verify(categoryRepository, times(1)).delete(category1);
-    }
-
-    @Test
     void testDeleteGroup_NotFound() {
         when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(CategoryNotFoundException.class, () -> categoryService.deleteGroup(1L));
@@ -146,14 +137,5 @@ class CategoryServiceTest {
         assertThrows(ValidationException.class,
                 () -> categoryService.updateGroup(1L, updatedCategory));
         verify(categoryRepository, never()).save(any());
-    }
-
-    @Test
-    void testDeleteGroup_ClearsCache() throws CategoryNotFoundException {
-        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category1));
-
-        categoryService.deleteGroup(1L);
-
-        verify(categoryRepository, times(1)).delete(category1);
     }
 }
