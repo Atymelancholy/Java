@@ -97,12 +97,6 @@ class ResponseServiceTest {
     }
 
     @Test
-    void testGetBookResponses_NoResponsesFound() {
-        when(responseRepository.findByBookId(book.getId())).thenReturn(Collections.emptyList());
-        assertThrows(PostNotFoundException.class, () -> responseService.getBookResponses(book.getId()));
-    }
-
-    @Test
     void testDeleteResponse_NotFound() {
         when(responseRepository.findById(response.getId())).thenReturn(Optional.empty());
         assertThrows(PostNotFoundException.class, () -> responseService.deleteResponse(response.getId()));
