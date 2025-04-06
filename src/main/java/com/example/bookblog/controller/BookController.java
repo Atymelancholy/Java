@@ -100,5 +100,37 @@ public class BookController {
             return ResponseEntity.notFound().build();
         }
     }
+    
+    @Operation(summary = "Добавление списка книг",
+            description = "Позволяет добавить несколько книг за один запрос")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201",
+                    description = "Книги успешно добавлены"),
+        @ApiResponse(responseCode = "400",
+                    description = "Некорректные данные запроса")
+    })
+    @PostMapping(value = "/bulk")
+    public ResponseEntity<List<Book>> addBooksBulk(@RequestBody List<Book> books) {
+        List<Book> validBooks = books.stream()
+                .peek(book -> {
+                    if (book.getTitle() == null || book.getTitle().trim().isEmpty()) {
+                        throw new IllegalArgumentException("Title must not be empty");
+                    }
+                    if (book.getAuthor() == null || book.getAuthor().trim().isEmpty()) {
+                        throw new IllegalArgumentException("Author must not be empty");
+                    }
+                    book.setId(null);
+                })
+                .filter(book -> !bookService.existsByTitleAndAuthor(book.getTitle(),
+                        book.getAuthor()))
+                .collect(Collectors.toList());
+
+        if (validBooks.isEmpty()) {
+            throw  new IllegalArgumentException("Bad request");
+        }
+
+        List<Book> savedBooks = bookService.saveBooksBulk(validBooks);
+        return new ResponseEntity<>(savedBooks, HttpStatus.CREATED);
+    }    
 }
 

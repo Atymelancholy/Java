@@ -191,8 +191,10 @@ class UserServiceTest {
         User updatedUser = new User();
         updatedUser.setUsername("valid");
         updatedUser.setPassword("");
-
-        assertThrows(ValidationException.class, () -> userService.updateUser(user.getId(), updatedUser));
+        assertThrows(ValidationException.class, () -> userService.
+    updateUser(user.
+    getId(), updatedUser));
+    Refactor the code of the lambda to have only one invocation possibly throwing a runtime exception.
 
         verify(userRepository, never()).findById(any());
         verify(userRepository, never()).save(any());
