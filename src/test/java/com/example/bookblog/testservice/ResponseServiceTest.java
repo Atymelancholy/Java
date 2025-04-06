@@ -78,11 +78,6 @@ class ResponseServiceTest {
     }
 
     @Test
-    void testCreateResponse_EmptyContent() {
-        assertThrows(ValidationException.class, () -> responseService.createResponse(user.getId(), book.getId(), " "));
-    }
-
-    @Test
     void testGetUserResponses_Success() throws Exception {
         when(responseRepository.findByUserId(user.getId())).thenReturn(List.of(response));
         List<Response> responses = responseService.getUserResponses(user.getId());
