@@ -52,7 +52,6 @@ public class Log {
         taskStatusMap.put(taskId, "PENDING");
 
         executor.submit(() -> {
-            try {
                 Thread.sleep(10000);
                 taskStatusMap.put(taskId, "PROCESSING");
 
@@ -70,10 +69,6 @@ public class Log {
 
                 taskFileMap.put(taskId, tempFilePath.toString());
                 taskStatusMap.put(taskId, "COMPLETED");
-
-            } catch (Exception e) {
-                taskStatusMap.put(taskId, "ERROR: " + e.getMessage());
-            }
         });
 
         return ResponseEntity.accepted().body(Map.of(
