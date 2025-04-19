@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: bookblog-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: massivpunkov  # Пароль для MySQL root пользователя
+      MYSQL_DATABASE: book_blog  # Имя базы данных
+      MYSQL_TCP_PORT: 3306  # Порт MySQL
+    ports:
+      - "3307:3306"  # Проброс порта MySQL
+    volumes:
+      - mysql_data:/var/lib/mysql  # Персистентные данные
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pmassivpunkov"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  app:
+    build:
+      context: .  # Путь к исходному коду для сборки контейнера
+      dockerfile: Dockerfile  # Путь к Dockerfile
+    container_name: bookblog-backend
+    ports:
+      - "8080:8080"  # Проброс порта backend-приложения
+    environment:
+      DB_PASSWORD: massivpunkov  # Пароль для базы данных
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/book_blog?useSSL=false&allowPublicKeyRetrieval=true&autoReconnect=true  # URL к базе данных
+      SPRING_DATASOURCE_USERNAME: root  # Имя пользователя для базы данных
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}  # Пароль для базы данных
+      SPRING_PROFILES_ACTIVE: prod  # Профиль приложения
+    volumes:
+      - ./logs:/app/logs  # Логи приложения
+    depends_on:
+      mysql:
+        condition: service_healthy  # Зависимость от MySQL
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]  # Проверка здоровья backend-приложения
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: C:/Users/atyme/bookblog-frontend  # Путь к исходному коду frontend-приложения
+      dockerfile: Dockerfile  # Путь к Dockerfile
+    container_name: bookblog-frontend
+    ports:
+      - "3000:80"  # Проброс порта frontend-приложения
+    environment:
+      REACT_APP_API_URL: http://app:8080  # API URL для frontend-приложения
+    depends_on:
+      - app  # Зависимость от backend-приложения
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:latest  # Используем официальный образ Nginx
+    container_name: bookblog-nginx
+    ports:
+      - "80:80"  # Проброс порта 80 для Nginx
+    volumes:
+      - "C:/Users/atyme/bookblog-frontend/nginx.conf:/etc/nginx/nginx.conf"
+    depends_on:
+      - frontend  # Зависимость от frontend-приложения
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin  # Официальный образ phpMyAdmin
+    container_name: bookblog-phpmyadmin
+    environment:
+      MYSQL_ROOT_PASSWORD: massivpunkov  # Пароль для MySQL root пользователя
+      PMA_HOST: mysql  # Указываем имя контейнера с MySQL
+    ports:
+      - "8082:80"  # Проброс порта 8081 для доступа к phpMyAdmin
+    networks:
+      - app-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:  # Персистентное хранилище для MySQL данных
+
+networks:
+  app-network:
+    driver: bridge  # Используем bridge-сеть для контейнеров
