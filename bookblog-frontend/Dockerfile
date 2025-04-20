@@ -1,21 +1,13 @@
-# Этап сборки
-FROM node:18-alpine AS build
+# Используем легковесный образ
+FROM eclipse-temurin:17-jre-jammy
+
 WORKDIR /app
 
-# Сначала копируем только package.json для кеширования зависимостей
-COPY package.json package-lock.json ./
+# Копируем только собранный JAR
+COPY target/BookBlogTest-*.jar app.jar
 
-# Устанавливаем все зависимости, включая devDependencies
-RUN npm install --force
+# Оптимизированные параметры JVM
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75"
 
-# Копируем остальные файлы
-COPY . .
-
-# Сборка проекта
-RUN npm run build
-
-# Этап запуска
-FROM nginx:alpine
-COPY --from=build /app/build /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
+# Точка входа
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar app.jar"]
