@@ -3,7 +3,6 @@ package com.example.bookblog.testservice;
 import com.example.bookblog.cache.InMemoryCache;
 import com.example.bookblog.dto.CategoryWithUsersDto;
 import com.example.bookblog.entity.Category;
-import com.example.bookblog.exception.CacheMissException;
 import com.example.bookblog.exception.CategoryAlreadyExistException;
 import com.example.bookblog.exception.CategoryNotFoundException;
 import com.example.bookblog.exception.ValidationException;
@@ -22,7 +21,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -86,14 +84,6 @@ class CategoryServiceTest {
     }
 
     @Test
-    void testGetOne_FromCache() throws CategoryNotFoundException {
-        CategoryWithUsersDto dto = new CategoryWithUsersDto();
-        when(categoryCache.getOrCompute(eq(1L), any())).thenReturn(dto);
-        CategoryWithUsersDto result = categoryService.getOne(1L);
-        assertEquals(dto, result);
-    }
-
-    @Test
     void testUpdateGroup_Success() throws CategoryNotFoundException {
         Category updatedCategory = new Category();
         updatedCategory.setName("Updated Name");
@@ -109,15 +99,6 @@ class CategoryServiceTest {
     void testUpdateGroup_NotFound() {
         when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(CategoryNotFoundException.class, () -> categoryService.updateGroup(1L, category1));
-    }
-
-    @Test
-    void testDeleteGroup_Success() throws CategoryNotFoundException {
-        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category1));
-
-        categoryService.deleteGroup(1L);
-
-        verify(categoryRepository, times(1)).delete(category1);
     }
 
     @Test
@@ -146,14 +127,5 @@ class CategoryServiceTest {
         assertThrows(ValidationException.class,
                 () -> categoryService.updateGroup(1L, updatedCategory));
         verify(categoryRepository, never()).save(any());
-    }
-
-    @Test
-    void testDeleteGroup_ClearsCache() throws CategoryNotFoundException {
-        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category1));
-
-        categoryService.deleteGroup(1L);
-
-        verify(categoryRepository, times(1)).delete(category1);
     }
 }

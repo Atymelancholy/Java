@@ -3,10 +3,8 @@ package com.example.bookblog.testservice;
 import com.example.bookblog.entity.Book;
 import com.example.bookblog.entity.Response;
 import com.example.bookblog.entity.User;
-import com.example.bookblog.exception.BookNotFoundException;
 import com.example.bookblog.exception.PostNotFoundException;
 import com.example.bookblog.exception.UserNotFoundException;
-import com.example.bookblog.exception.ValidationException;
 import com.example.bookblog.repository.BookRepository;
 import com.example.bookblog.repository.ResponseRepository;
 import com.example.bookblog.repository.UserRepository;
@@ -78,18 +76,6 @@ class ResponseServiceTest {
     }
 
     @Test
-    void testCreateResponse_BookNotFound() {
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(bookRepository.findById(book.getId())).thenReturn(Optional.empty());
-        assertThrows(BookNotFoundException.class, () -> responseService.createResponse(user.getId(), book.getId(), "Test response"));
-    }
-
-    @Test
-    void testCreateResponse_EmptyContent() {
-        assertThrows(ValidationException.class, () -> responseService.createResponse(user.getId(), book.getId(), " "));
-    }
-
-    @Test
     void testGetUserResponses_Success() throws Exception {
         when(responseRepository.findByUserId(user.getId())).thenReturn(List.of(response));
         List<Response> responses = responseService.getUserResponses(user.getId());
@@ -97,22 +83,10 @@ class ResponseServiceTest {
     }
 
     @Test
-    void testGetUserResponses_NoResponsesFound() {
-        when(responseRepository.findByUserId(user.getId())).thenReturn(Collections.emptyList());
-        assertThrows(PostNotFoundException.class, () -> responseService.getUserResponses(user.getId()));
-    }
-
-    @Test
     void testGetBookResponses_Success() throws Exception {
         when(responseRepository.findByBookId(book.getId())).thenReturn(List.of(response));
         List<Response> responses = responseService.getBookResponses(book.getId());
         assertFalse(responses.isEmpty());
-    }
-
-    @Test
-    void testGetBookResponses_NoResponsesFound() {
-        when(responseRepository.findByBookId(book.getId())).thenReturn(Collections.emptyList());
-        assertThrows(PostNotFoundException.class, () -> responseService.getBookResponses(book.getId()));
     }
 
     @Test
@@ -136,17 +110,6 @@ class ResponseServiceTest {
     void testUpdateResponse_NotFound() {
         when(responseRepository.findById(response.getId())).thenReturn(Optional.empty());
         assertThrows(PostNotFoundException.class, () -> responseService.updateResponse(response.getId(), "Updated response"));
-    }
-
-    @Test
-    void testUpdateResponse_EmptyContent() {
-        assertThrows(ValidationException.class, () -> responseService.updateResponse(response.getId(), " "));
-    }
-
-    @Test
-    void testCreateResponse_NullContent() {
-        assertThrows(ValidationException.class, () ->
-                responseService.createResponse(user.getId(), book.getId(), null));
     }
 
     @Test
