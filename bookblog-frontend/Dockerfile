@@ -1,13 +1,13 @@
-# Используем легковесный образ
-FROM eclipse-temurin:17-jre-jammy
-
+# Сборка
+FROM node:18-alpine AS builder
 WORKDIR /app
+COPY frontend/package*.json .
+RUN npm install
+COPY frontend .
+RUN npm run build
 
-# Копируем только собранный JAR
-COPY target/BookBlogTest-*.jar app.jar
-
-# Оптимизированные параметры JVM
-ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75"
-
-# Точка входа
-ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar app.jar"]
+# Запуск
+FROM nginx:alpine
+COPY --from=builder /app/build /usr/share/nginx/html
+COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
