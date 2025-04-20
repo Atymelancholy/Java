@@ -1,14 +1,22 @@
-# Сборка
-FROM maven:3.8.6-eclipse-temurin-17 AS build
-WORKDIR /app
-COPY backend/pom.xml .
-RUN mvn -B dependency:go-offline
-COPY backend/src ./src
-RUN mvn -B package -DskipTests
+# Этап сборки с оптимизацией памяти
+FROM maven:3.8.6-eclipse-temurin-17 AS builder
 
-# Запуск
-FROM eclipse-temurin:17-jre
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+COPY pom.xml .
+# Кэшируем зависимости
+RUN mvn -B dependency:go-offline -Dmaven.test.skip=true
+
+COPY src ./src
+# Сборка с ограничением памяти
+RUN mvn -B package -DskipTests \
+    -Dmaven.javadoc.skip=true \
+    -Dmaven.compile.fork=true \
+    -T 1C \
+    -Dspring-boot.repackage.mainClass=com.example.BookBlogApplication
+
+# Финальный образ
+FROM eclipse-temurin:17-jre-jammy
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
