@@ -1,21 +1,15 @@
 {
   "build": {
-    "builder": "nixpacks",
+    "builder": "docker",
     "config": {
-      "startCommand": "mvn -B -DskipTests clean package && java -jar target/BookBlogTest-*.jar"
+      "dockerfile": "Dockerfile"
     }
   },
   "deploy": {
-    "services": [
-      {
-        "name": "backend",
-        "env": {
-          "SPRING_DATASOURCE_URL": "jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQLDATABASE}",
-          "SPRING_DATASOURCE_USERNAME": "${MYSQLUSER}",
-          "SPRING_DATASOURCE_PASSWORD": "${MYSQLPASSWORD}",
-          "SPRING_PROFILES_ACTIVE": "prod"
-        }
-      }
-    ]
+    "startCommand": "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75 -jar app.jar",
+    "environment": {
+      "RAILWAY": "true",
+      "SPRING_PROFILES_ACTIVE": "prod"
+    }
   }
 }
