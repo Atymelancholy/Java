@@ -13,9 +13,9 @@
     </parent>
 
     <groupId>com.example</groupId>
-    <artifactId>BookBlog</artifactId>
+    <artifactId>book-blog</artifactId>
     <version>1.0.0</version>
-    <name>BookBlog</name>
+    <name>book-blog</name>
     <description>Book Blog Application</description>
 
     <properties>
@@ -23,7 +23,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <start-class>com.example.BookBlogApplication</start-class>
+        <start-class>com.example.bookblog.BookBlogApplication</start-class>
         <skipTests>true</skipTests>
         <springdoc.version>2.8.5</springdoc.version>
     </properties>
@@ -57,7 +57,7 @@
             <version>${springdoc.version}</version>
         </dependency>
 
-        <!-- Development -->
+        <!-- Utils -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -117,8 +117,9 @@
                             <version>1.18.32</version>
                         </path>
                     </annotationProcessorPaths>
+                    <parameters>true</parameters>
                     <compilerArgs>
-                        <arg>-parameters</arg>
+                        <arg>-Xlint:all</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>
@@ -130,6 +131,7 @@
                 <version>3.3.1</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
+                    <useDefaultDelimiters>true</useDefaultDelimiters>
                 </configuration>
             </plugin>
         </plugins>
@@ -147,10 +149,10 @@
 
     <profiles>
         <profile>
-            <id>railway</id>
+            <id>production</id>
             <activation>
                 <property>
-                    <name>env.RAILWAY</name>
+                    <name>env.PRODUCTION</name>
                 </property>
             </activation>
             <properties>
