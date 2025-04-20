@@ -1,23 +1,20 @@
 {
   "build": {
     "builder": "nixpacks",
-    "config": {}
+    "config": {
+      "startCommand": "mvn -B -DskipTests clean package && java -jar target/BookBlogTest-*.jar"
+    }
   },
   "deploy": {
     "services": [
       {
         "name": "backend",
-        "startCommand": "java -jar target/BookBlogT-*.jar",
         "env": {
-          "SPRING_DATASOURCE_URL": "jdbc:mysql://${DB_HOST}:3306/${DB_NAME}",
-          "SPRING_DATASOURCE_USERNAME": "root",
-          "SPRING_DATASOURCE_PASSWORD": "massivpunkov",
+          "SPRING_DATASOURCE_URL": "jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQLDATABASE}",
+          "SPRING_DATASOURCE_USERNAME": "${MYSQLUSER}",
+          "SPRING_DATASOURCE_PASSWORD": "${MYSQLPASSWORD}",
           "SPRING_PROFILES_ACTIVE": "prod"
         }
-      },
-      {
-        "name": "frontend",
-        "startCommand": "npm start"
       }
     ]
   }
