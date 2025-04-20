@@ -1,13 +1,14 @@
-# Этап сборки
-FROM node:18-alpine AS builder
+# Сборка
+FROM maven:3.8.6-eclipse-temurin-17 AS build
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
+COPY backend/pom.xml .
+RUN mvn -B dependency:go-offline
+COPY backend/src ./src
+RUN mvn -B package -DskipTests
 
-# Этап запуска
-FROM nginx:alpine
-COPY --from=builder /app/build /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
+# Запуск
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
