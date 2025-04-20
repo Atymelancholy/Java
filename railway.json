@@ -1,0 +1,50 @@
+{
+    "builds": [
+      {
+        "src": "BookBlogT/Dockerfile",  // Путь к Dockerfile для бэкенда
+        "use": "@railway/sql",          // Используем Railway для работы с базой данных
+        "env": {
+          "DB_HOST": "mydb.xxxxxx.rds.amazonaws.com",  // Адрес базы данных (получим через Railway)
+          "DB_USERNAME": "root",
+          "DB_PASSWORD": "massivpunkov",
+          "DB_NAME": "book_blog"
+        }
+      },
+      {
+        "src": "bookblog-rontend/Dockerfile",  // Путь к Dockerfile для фронтенда
+        "use": "@railway/nginx"
+      }
+    ],
+    "services": [
+      {
+        "name": "bookblog-backend",  // Название для сервиса бэкенда
+        "env": "docker",  // Указываем использование Docker
+        "buildCommand": "mvn clean install",  // Если необходимо для Maven
+        "startCommand": "java -jar target/BookBlogT-*.jar",  // Запуск бэкенда
+        "envVars": [
+          {
+            "key": "SPRING_DATASOURCE_URL",
+            "value": "jdbc:mysql://${DB_HOST}:3306/${DB_NAME}"  // URL для базы данных
+          },
+          {
+            "key": "SPRING_DATASOURCE_USERNAME",
+            "value": "root"
+          },
+          {
+            "key": "SPRING_DATASOURCE_PASSWORD",
+            "value": "massivpunkov"
+          },
+          {
+            "key": "SPRING_PROFILES_ACTIVE",
+            "value": "prod"
+          }
+        ]
+      },
+      {
+        "name": "bookblog-frontend",  // Название для сервиса фронтенда
+        "env": "docker",  // Указываем использование Docker
+        "startCommand": "npm start"  // Запуск фронтенда
+      }
+    ]
+  }
+  
